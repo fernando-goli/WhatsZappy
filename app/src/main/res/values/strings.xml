@@ -1,3 +1,17 @@
 <resources>
+
+    <!--Login / Register -->
     <string name="app_name">WhatsZappy</string>
+    <string name="image_logo">image_logo</string>
+    <string name="digite_email">Digite seu email</string>
+    <string name="digite_senha">Digite sua senha</string>
+    <string name="digite_nome">Digite seu nome</string>
+    <string name="loginBtn">Login</string>
+    <string name="cadastre_se">Cadastre-se</string>
+    <string name="nao_tem_conta">Não tem conta ?</string>
+    <string name="cadastrar">Cadastrar</string>
+
+    <!---->
+
+
 </resources>
