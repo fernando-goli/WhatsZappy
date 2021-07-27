@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "462908400133",
+    "project_id": "whatszappy",
+    "storage_bucket": "whatszappy.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:462908400133:android:ec03f8a3480f364860b26c",
+        "android_client_info": {
+          "package_name": "com.example.whatszappy"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "462908400133-03shlhra8c8mke47q8858mols1sn5c6l.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.whatszappy",
+            "certificate_hash": "c6206b5111e10822b313f5b75963de2f4a839173"
+          }
+        },
+        {
+          "client_id": "462908400133-7mlru2is1id5mnaapl9at6jh1juoa86f.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCNFbq2FtHGFzlpvpsL6fZvSAF7iOZzqwQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "462908400133-7mlru2is1id5mnaapl9at6jh1juoa86f.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
