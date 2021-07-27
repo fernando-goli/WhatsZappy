@@ -10,6 +10,7 @@ import android.widget.Toast;
 
 import com.example.whatszappy.R;
 import com.example.whatszappy.config.ConfigFirebase;
+import com.example.whatszappy.helper.UserFirebase;
 import com.example.whatszappy.model.Usuario;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -36,7 +37,7 @@ public class RegisterActivity extends AppCompatActivity {
         editName = findViewById(R.id.editName);
         editEmail = findViewById(R.id.editLoginEmail);
         editPassw = findViewById(R.id.editLoginPassw);
-        register = findViewById(R.id.button);
+        register = findViewById(R.id.buttonReg);
 
 
     }//onCreate
@@ -80,7 +81,17 @@ public class RegisterActivity extends AppCompatActivity {
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if (task.isSuccessful()){
 
+                    try {
+                        FirebaseUser idUser = fbAuth.getCurrentUser();
+                        String uid = idUser.getUid();
+                        usuario.setIdUser(uid);
 
+                        usuario.salvar();
+
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+                    UserFirebase.updateNameUser(usuario.getNome());
                     Toast.makeText(RegisterActivity.this, "Sucesso ao cadastrar usuario", Toast.LENGTH_SHORT).show();
                     finish();
 

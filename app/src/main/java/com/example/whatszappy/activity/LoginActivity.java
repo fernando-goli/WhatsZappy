@@ -36,8 +36,6 @@ public class LoginActivity extends AppCompatActivity {
         editSenha = findViewById(R.id.editLoginPassw);
         buttonLogin = findViewById(R.id.btnLogin);
 
-        verifyUserLogged();
-
     }
 
     public void validateUser(View view){
@@ -94,7 +92,8 @@ public class LoginActivity extends AppCompatActivity {
 
     public void verifyUserLogged(){
         //recupera usuario atual e verifica se esta logado
-        if ( loginAuth != null ){
+        FirebaseUser user = loginAuth.getCurrentUser();
+        if( user != null){
             openMain();
         }
     }
@@ -108,4 +107,10 @@ public class LoginActivity extends AppCompatActivity {
         finish();
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        verifyUserLogged();
+
+    }
 }
