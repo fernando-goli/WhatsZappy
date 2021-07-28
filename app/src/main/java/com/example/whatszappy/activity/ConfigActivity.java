@@ -23,7 +23,6 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.example.whatszappy.R;
 import com.example.whatszappy.config.ConfigFirebase;
-import com.example.whatszappy.helper.Permission;
 import com.example.whatszappy.helper.UserFirebase;
 import com.example.whatszappy.model.Usuario;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -60,12 +59,13 @@ public class ConfigActivity extends AppCompatActivity {
         toolbar.setTitle("Configurações");
         setSupportActionBar(toolbar);
 
+        //cria botao de voltar na toolbar
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         nameUser = findViewById(R.id.editName);
         buttonCamera = findViewById(R.id.btnCamera);
         buttonPhoto = findViewById(R.id.btnPhoto);
-        imageUser = findViewById(R.id.circleImageUser);
+        imageUser = findViewById(R.id.circleImageContato);
 
 
         //verifica usuario logado
