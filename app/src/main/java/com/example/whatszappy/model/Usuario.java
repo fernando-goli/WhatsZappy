@@ -5,10 +5,11 @@ import com.example.whatszappy.helper.UserFirebase;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.Exclude;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Usuario {
+public class Usuario implements Serializable {
 
     private String nome, email, senha, idUser, foto;
 
@@ -49,7 +50,7 @@ public class Usuario {
     }
 
     @Exclude
-    public String getIdUser() {
+    private String getIdUser() {
         return idUser;
     }
 
@@ -77,7 +78,7 @@ public class Usuario {
     }
 
     @Exclude
-    public Map <String, Object> convertMap () {
+    private Map <String, Object> convertMap () {
         HashMap<String, Object> userMap = new HashMap<>();
         userMap.put("email", getEmail());
         userMap.put("nome", getNome());
