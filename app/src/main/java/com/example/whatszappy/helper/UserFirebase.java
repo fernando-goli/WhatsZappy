@@ -30,8 +30,11 @@ public class UserFirebase {
     public static Boolean updatePhotoUser (Uri url){
         try{
             FirebaseUser user = getUserAtual();
-            UserProfileChangeRequest profile = new UserProfileChangeRequest.Builder()
-                .setPhotoUri( url ).build();
+            UserProfileChangeRequest profile = new UserProfileChangeRequest
+                .Builder()
+                .setPhotoUri( url )
+                .build();
+
             user.updateProfile(profile).addOnCompleteListener(new OnCompleteListener<Void>() {
                 @Override
                 public void onComplete(@NonNull Task<Void> task) {
@@ -51,8 +54,11 @@ public class UserFirebase {
     public static Boolean updateNameUser (String name){
         try{
             FirebaseUser user = getUserAtual();
-            UserProfileChangeRequest profile = new UserProfileChangeRequest.Builder()
-                .setDisplayName( name ).build();
+            UserProfileChangeRequest profile = new UserProfileChangeRequest
+                .Builder()
+                .setDisplayName( name )
+                .build();
+
             user.updateProfile(profile).addOnCompleteListener(new OnCompleteListener<Void>() {
                 @Override
                 public void onComplete(@NonNull Task<Void> task) {

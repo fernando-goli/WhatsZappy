@@ -49,8 +49,8 @@ public class Usuario implements Serializable {
         this.senha = senha;
     }
 
-    @Exclude
-    private String getIdUser() {
+    //@Exclude
+    public String getIdUser() {
         return idUser;
     }
 
@@ -78,7 +78,7 @@ public class Usuario implements Serializable {
     }
 
     @Exclude
-    private Map <String, Object> convertMap () {
+    public Map <String, Object> convertMap () {
         HashMap<String, Object> userMap = new HashMap<>();
         userMap.put("email", getEmail());
         userMap.put("nome", getNome());

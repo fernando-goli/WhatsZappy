@@ -52,7 +52,6 @@ public class ContatosAdapter extends RecyclerView.Adapter<ContatosAdapter.MyView
             holder.photo.setImageResource( R.drawable.padrao );
         }
 
-
     }
 
     @Override
@@ -71,7 +70,6 @@ public class ContatosAdapter extends RecyclerView.Adapter<ContatosAdapter.MyView
             photo = itemView.findViewById(R.id.circleImageContato);
             name = itemView.findViewById(R.id.textNameContato);
             email = itemView.findViewById(R.id.textEmailContato);
-
 
 
         }
