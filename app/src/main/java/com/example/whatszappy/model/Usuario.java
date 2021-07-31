@@ -49,6 +49,7 @@ public class Usuario implements Serializable {
         this.senha = senha;
     }
 
+    //TODO: Por enquanto manter comentado o exclude.
     //@Exclude
     public String getIdUser() {
         return idUser;

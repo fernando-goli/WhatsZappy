@@ -9,20 +9,19 @@
         android:orientation="vertical"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@drawable/bg_balao"
-        android:backgroundTint="@color/balaoReme"
+        android:background="@drawable/bg_balaoreme"
         android:layout_margin="6dp"
         android:layout_alignParentEnd="true">
 
         <ImageView
-            android:id="@+id/imageMsgRem"
+            android:id="@+id/imageMsgImage"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:srcCompat="@drawable/padrao" />
 
 
         <TextView
-            android:id="@+id/textMsgRem"
+            android:id="@+id/textMsgText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="TextView"

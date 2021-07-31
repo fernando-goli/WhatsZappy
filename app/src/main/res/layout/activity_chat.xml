@@ -44,7 +44,7 @@
             </androidx.cardview.widget.CardView>
 
             <TextView
-                android:id="@+id/nameChat"
+                android:id="@+id/nameChatContato"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Nome Nome"
