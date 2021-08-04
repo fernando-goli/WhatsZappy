@@ -144,7 +144,6 @@ public class ConfigActivity extends AppCompatActivity {
                     image.compress(Bitmap.CompressFormat.JPEG, 70, baos);
                     byte[] dataImage = baos.toByteArray();
 
-
                     //salvar imagem no firebase
                     final StorageReference imageRef = ConfigFirebase.getFirebaseStorage()
                         .child("imagens")
