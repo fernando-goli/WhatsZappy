@@ -2,6 +2,7 @@ package com.example.whatszappy.model;
 
 
 import com.example.whatszappy.config.ConfigFirebase;
+import com.example.whatszappy.helper.Base64Custom;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
@@ -17,8 +18,9 @@ public class Grupo implements Serializable {
     private List<Usuario> membros;
 
     public Grupo() {
-        DatabaseReference databaseReference = ConfigFirebase.getFirebaseDatabase();
-        DatabaseReference grupoRef = databaseReference.child("grupos");
+
+        DatabaseReference database = ConfigFirebase.getFirebaseDatabase();
+        DatabaseReference grupoRef = database.child("grupos");
 
         String idGrupoFirebase = grupoRef.push().getKey();
         setId( idGrupoFirebase );
@@ -26,27 +28,27 @@ public class Grupo implements Serializable {
     }
 
     public void salvar(){
-        DatabaseReference databaseReference = ConfigFirebase.getFirebaseDatabase();
-        DatabaseReference grupoRef = databaseReference.child("grupos");
+
+        DatabaseReference database = ConfigFirebase.getFirebaseDatabase();
+        DatabaseReference grupoRef = database.child("grupos");
 
         grupoRef.child( getId() ).setValue( this );
 
-        for( Usuario membro: getMembros()){
+        //Salvar conversa para membros do grupo
+        for( Usuario membro: getMembros() ){
 
-            //FirebaseUser uidUserFb = FirebaseAuth.getInstance().getCurrentUser();
-            //String uidFirebase = uidUserFb.getUid();
-
-            String idRemet = membro.getIdUser();
-            String idDesti = getId();
+            String idRemetente = Base64Custom.codificarBase64( membro.getEmail() );
+            String idDestinatario = getId();
 
             Conversa conversa = new Conversa();
-            conversa.setIdReme( idRemet );
-            conversa.setIdDest( idDesti );
-            conversa.setLastMsg("");
+            conversa.setIdRemetente( idRemetente );
+            conversa.setIdDestinatario( idDestinatario );
+            conversa.setUltimaMensagem("");
             conversa.setIsGroup("true");
             conversa.setGrupo( this );
 
             conversa.salvar();
+
         }
 
     }

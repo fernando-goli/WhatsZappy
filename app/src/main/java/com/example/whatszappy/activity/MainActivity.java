@@ -35,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
         toolbar.setTitle("WhatsZappy");
         setSupportActionBar(toolbar);
 
-        auth = ConfigFirebase.getFirebaseAuth();
+        auth = ConfigFirebase.getFirebaseAuthentication();
 
         //Configurar abas
         FragmentPagerItemAdapter adapter = new FragmentPagerItemAdapter(
@@ -64,7 +64,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onSearchViewClosed() {
                 ConversasFragment fragment = (ConversasFragment) adapter.getPage( 0);
-                fragment.chargeC();
+                fragment.recarregarConversas();
 
             }
         });
@@ -81,7 +81,7 @@ public class MainActivity extends AppCompatActivity {
                 ConversasFragment fragment = (ConversasFragment) adapter.getPage( 0);
 
                 if ( newText != null && !newText.isEmpty() ){
-                    fragment.searchConversas( newText.toLowerCase() );
+                    fragment.pesquisarConversas( newText.toLowerCase() );
                 }
 
                 return false;

@@ -46,7 +46,7 @@
             android:name=".activity.ConfigActivity"
             android:parentActivityName=".activity.MainActivity" />
         <activity android:name=".activity.MainActivity" />
-        <activity android:name=".activity.RegisterActivity" />
+        <activity android:name=".activity.CadastroActivity" />
         <activity android:name=".activity.LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

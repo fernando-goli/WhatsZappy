@@ -4,13 +4,12 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import com.example.whatszappy.adapter.ContatosAdapter;
-import com.example.whatszappy.adapter.GrupoSelectAdapter;
+import com.example.whatszappy.adapter.GrupoSelecionadoAdapter;
 import com.example.whatszappy.config.ConfigFirebase;
 import com.example.whatszappy.helper.RecyclerItemClickListener;
 import com.example.whatszappy.helper.UserFirebase;
 import com.example.whatszappy.model.Usuario;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -30,19 +29,29 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
 
 public class GrupoActivity extends AppCompatActivity {
 
-    private ArrayList<Usuario> listMember = new ArrayList<>();
-    private ArrayList<Usuario> listMemberSelect = new ArrayList<>();
-    private RecyclerView recyclerMembSelect, recyclerMemb;
+    private RecyclerView recyclerMembrosSelecionados, recyclerMembros;
     private ContatosAdapter contatosAdapter;
-    private GrupoSelectAdapter grupoSelectAdapter;
-    private ValueEventListener valueEventListenerMember;
-    private DatabaseReference userRefDb;
-    private FirebaseUser userAtual;
+    private GrupoSelecionadoAdapter grupoSelecionadoAdapter;
+    private List<Usuario> listaMembros = new ArrayList<>();
+    private List<Usuario> listaMembrosSelecionados = new ArrayList<>();
+    private ValueEventListener valueEventListenerMembros;
+    private DatabaseReference usuariosRef;
+    private FirebaseUser usuarioAtual;
     private Toolbar toolbar;
-    private FloatingActionButton fabNext;
+    private FloatingActionButton fabAvancarCadastro;
+
+    public void atualizarMembrosToolbar(){
+
+        int totalSelecionados = listaMembrosSelecionados.size();
+        int total = listaMembros.size() + totalSelecionados;
+
+        toolbar.setSubtitle(totalSelecionados + " de " + total + " selecionados" );
+
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,44 +59,47 @@ public class GrupoActivity extends AppCompatActivity {
         setContentView(R.layout.activity_grupo);
         toolbar = findViewById(R.id.toolbar);
         toolbar.setTitle("Novo grupo");
+
         setSupportActionBar(toolbar);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        //config iniciais
-        userAtual = UserFirebase.getUserAtual();
-        userRefDb = ConfigFirebase.getFirebaseDatabase().child("usuarios");
-        recyclerMemb = findViewById(R.id.recyclerMember);
-        recyclerMembSelect = findViewById(R.id.recyclerMemberSelect);
-        fabNext = findViewById(R.id.fabNextCadastro);
+        //Configuracoes iniciais
+        recyclerMembros = findViewById(R.id.recyclerMember);
+        recyclerMembrosSelecionados = findViewById(R.id.recyclerMemberSelect);
+        fabAvancarCadastro = findViewById(R.id.fabNextCadastro);
 
+        usuariosRef  = ConfigFirebase.getFirebaseDatabase().child("usuarios");
+        usuarioAtual = UserFirebase.getUsuarioAtual();
+
+        //Configurar adapter
+        contatosAdapter = new ContatosAdapter(listaMembros, getApplicationContext());
 
         //Configura recyclerview para os contatos
-        contatosAdapter = new ContatosAdapter(listMember, getApplicationContext());
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
+        recyclerMembros.setLayoutManager( layoutManager );
+        recyclerMembros.setHasFixedSize(true);
+        recyclerMembros.setAdapter( contatosAdapter );
 
-        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager( getApplicationContext() );
-        recyclerMemb.setLayoutManager(layoutManager);
-        recyclerMemb.setHasFixedSize( true );
-        recyclerMemb.setAdapter( contatosAdapter );
-
-        recyclerMemb.addOnItemTouchListener(
+        recyclerMembros.addOnItemTouchListener(
             new RecyclerItemClickListener(
                 getApplicationContext(),
-                recyclerMemb,
+                recyclerMembros,
                 new RecyclerItemClickListener.OnItemClickListener() {
                     @Override
                     public void onItemClick(View view, int position) {
-                        Usuario userSelect = listMember.get( position );
 
-                        //remove user selecionado na lista geral
-                        listMember.remove( userSelect );
+                        Usuario usuarioSelecionado = listaMembros.get( position );
+
+                        //Remover usuario selecionada da lista
+                        listaMembros.remove( usuarioSelecionado );
                         contatosAdapter.notifyDataSetChanged();
 
-                        //adiciona user na lista do grupo
-                        listMemberSelect.add( userSelect );
-                        grupoSelectAdapter.notifyDataSetChanged();
+                        //Adiciona usuario na nova lista de selecionados
+                        listaMembrosSelecionados.add( usuarioSelecionado );
+                        grupoSelecionadoAdapter.notifyDataSetChanged();
 
-                        atualizarMemberToolbar();
+                        atualizarMembrosToolbar();
 
                     }
 
@@ -99,86 +111,100 @@ public class GrupoActivity extends AppCompatActivity {
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-                    }
-                }
-        )); //recyclerMemb
-
-        //recyclerview para membros selecionados
-        grupoSelectAdapter = new GrupoSelectAdapter(listMemberSelect, getApplicationContext());
-
-        RecyclerView.LayoutManager layoutManager1 = new LinearLayoutManager(
-            getApplicationContext(),
-            LinearLayoutManager.HORIZONTAL,
-            false
-        );
-        recyclerMembSelect.setLayoutManager(layoutManager1);
-        recyclerMembSelect.setHasFixedSize( true );
-        recyclerMembSelect.setAdapter( grupoSelectAdapter );
-
-
-        recyclerMembSelect.addOnItemTouchListener(
-            new RecyclerItemClickListener(
-                getApplicationContext(),
-                recyclerMembSelect,
-                new RecyclerItemClickListener.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(View view, int position) {
-                        //remove da lista de membros selecionado
-                        Usuario userSelect = listMemberSelect.get( position );
-                        listMemberSelect.remove( userSelect );
-                        grupoSelectAdapter.notifyDataSetChanged();
-
-                        //add a lista de membros
-                        listMember.add( userSelect );
-                        contatosAdapter.notifyDataSetChanged();
-
-                        atualizarMemberToolbar();
-
-                    }
-
-                    @Override
-                    public void onLongItemClick(View view, int position) {
-                    }
-
-                    @Override
-                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                     }
                 }
             )
         );
 
-        //fab
-        fabNext.setOnClickListener(new View.OnClickListener() {
+
+        //Configurar recyclerview para os membros selecionados
+        grupoSelecionadoAdapter = new GrupoSelecionadoAdapter(listaMembrosSelecionados, getApplicationContext());
+
+        RecyclerView.LayoutManager layoutManagerHorizontal = new LinearLayoutManager(
+            getApplicationContext(),
+            LinearLayoutManager.HORIZONTAL,
+            false
+        );
+        recyclerMembrosSelecionados.setLayoutManager(layoutManagerHorizontal);
+        recyclerMembrosSelecionados.setHasFixedSize(true);
+        recyclerMembrosSelecionados.setAdapter( grupoSelecionadoAdapter );
+
+        recyclerMembrosSelecionados.addOnItemTouchListener(
+            new RecyclerItemClickListener(
+                getApplicationContext(),
+                recyclerMembrosSelecionados,
+                new RecyclerItemClickListener.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(View view, int position) {
+
+                        Usuario usuarioSelecionado = listaMembrosSelecionados.get(position);
+
+                        //Remover da listagem de membros selecionados
+                        listaMembrosSelecionados.remove( usuarioSelecionado );
+                        grupoSelecionadoAdapter.notifyDataSetChanged();
+
+                        //Adicionar à listagem de membros
+                        listaMembros.add( usuarioSelecionado );
+                        contatosAdapter.notifyDataSetChanged();
+
+                        atualizarMembrosToolbar();
+
+                    }
+
+                    @Override
+                    public void onLongItemClick(View view, int position) {
+
+                    }
+
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                    }
+                }
+            )
+        );
+
+        //Configurar floating action button
+        fabAvancarCadastro.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent i = new Intent(GrupoActivity.this, CadastroGrupoActivity.class);
-                i.putExtra( "membros", listMemberSelect);
+                i.putExtra("membros", (Serializable) listaMembrosSelecionados );
                 startActivity( i );
             }
         });
 
-
-    }//onCreate
+    }
 
     public void recuperarContatos(){
-        valueEventListenerMember = userRefDb.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                for ( DataSnapshot dados: snapshot.getChildren() ){
-                    Usuario user = dados.getValue(Usuario.class);
 
-                    String emailUserAtual = userAtual.getEmail();
-                    if ( !emailUserAtual.equals(user.getEmail() ) ){
-                        listMember.add( user );
-                    }
-                }
-                contatosAdapter.notifyDataSetChanged();
-                atualizarMemberToolbar();
-            }
+        valueEventListenerMembros = usuariosRef.addValueEventListener(new ValueEventListener() {
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                for ( DataSnapshot dados: dataSnapshot.getChildren() ){
+
+                    Usuario usuario = dados.getValue( Usuario.class );
+
+                    String emailUsuarioAtual = usuarioAtual.getEmail();
+                    if ( !emailUsuarioAtual.equals( usuario.getEmail() ) ){
+                        listaMembros.add( usuario );
+                    }
+
+
+                }
+
+                contatosAdapter.notifyDataSetChanged();
+                atualizarMembrosToolbar();
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
             }
         });
+
     }
 
     @Override
@@ -190,13 +216,7 @@ public class GrupoActivity extends AppCompatActivity {
     @Override
     public void onStop() {
         super.onStop();
-        userRefDb.removeEventListener( valueEventListenerMember );
-    }
-
-    public void atualizarMemberToolbar(){
-        int totalSlect = listMemberSelect.size();
-        int total = listMember.size() + totalSlect;
-        toolbar.setSubtitle(totalSlect + " de " + total + " selecionados");
+        usuariosRef.removeEventListener( valueEventListenerMembros );
     }
 
 }

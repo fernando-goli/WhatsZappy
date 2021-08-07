@@ -15,79 +15,82 @@ import com.google.firebase.auth.UserProfileChangeRequest;
 
 public class UserFirebase {
 
-    public static String getUidFirebase(){
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        String uidFirebase = user.getUid();
+    public static String getIdentificadorUsuario(){
 
-        return uidFirebase;
+        FirebaseAuth usuario = ConfigFirebase.getFirebaseAuthentication();
+        String email = usuario.getCurrentUser().getEmail();
+        String identificadorUsuario = Base64Custom.codificarBase64( email );
+
+        return identificadorUsuario;
+
     }
 
-    public static FirebaseUser getUserAtual() {
-        FirebaseAuth user = ConfigFirebase.getFirebaseAuth();
-        return user.getCurrentUser();
+    public static FirebaseUser getUsuarioAtual(){
+        FirebaseAuth usuario = ConfigFirebase.getFirebaseAuthentication();
+        return usuario.getCurrentUser();
     }
 
-    public static Boolean updatePhotoUser (Uri url){
-        try{
-            FirebaseUser user = getUserAtual();
-            UserProfileChangeRequest profile = new UserProfileChangeRequest
-                .Builder()
+    public static boolean atualizarNomeUsuario(String nome){
+
+        try {
+
+            FirebaseUser user = getUsuarioAtual();
+            UserProfileChangeRequest profile = new UserProfileChangeRequest.Builder()
+                .setDisplayName( nome )
+                .build();
+
+            user.updateProfile( profile ).addOnCompleteListener(new OnCompleteListener<Void>() {
+                @Override
+                public void onComplete(@NonNull Task<Void> task) {
+                    if( !task.isSuccessful() ){
+                        Log.d("Perfil", "Erro ao atualizar nome de perfil.");
+                    }
+                }
+            });
+            return true;
+        }catch (Exception e){
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public static boolean atualizarFotoUsuario(Uri url){
+
+        try {
+
+            FirebaseUser user = getUsuarioAtual();
+            UserProfileChangeRequest profile = new UserProfileChangeRequest.Builder()
                 .setPhotoUri( url )
                 .build();
 
-            user.updateProfile(profile).addOnCompleteListener(new OnCompleteListener<Void>() {
+            user.updateProfile( profile ).addOnCompleteListener(new OnCompleteListener<Void>() {
                 @Override
                 public void onComplete(@NonNull Task<Void> task) {
-                    if(task.isSuccessful()){
-                        Log.d("Perfil", "Erro ao atualizar foto");
+                    if( !task.isSuccessful() ){
+                        Log.d("Perfil", "Erro ao atualizar foto de perfil.");
                     }
                 }
             });
+            return true;
         }catch (Exception e){
             e.printStackTrace();
             return false;
         }
-
-        return true;
     }
 
-    public static Boolean updateNameUser (String name){
-        try{
-            FirebaseUser user = getUserAtual();
-            UserProfileChangeRequest profile = new UserProfileChangeRequest
-                .Builder()
-                .setDisplayName( name )
-                .build();
+    public static Usuario getDadosUsuarioLogado(){
 
-            user.updateProfile(profile).addOnCompleteListener(new OnCompleteListener<Void>() {
-                @Override
-                public void onComplete(@NonNull Task<Void> task) {
-                    if(task.isSuccessful()){
-                        Log.d("Perfil", "Erro ao atualizar nome");
-                    }
-                }
-            });
-        }catch (Exception e){
-            e.printStackTrace();
-            return false;
-        }
+        FirebaseUser firebaseUser = getUsuarioAtual();
 
-        return true;
-    }
+        Usuario usuario = new Usuario();
+        usuario.setEmail( firebaseUser.getEmail() );
+        usuario.setNome( firebaseUser.getDisplayName() );
 
-    public static Usuario getDataUserLogged(){
-        FirebaseUser fbUser = getUserAtual();
-
-        Usuario user = new Usuario();
-        user.setEmail(fbUser.getEmail());
-        user.setNome(fbUser.getDisplayName());
-
-        if(fbUser.getPhotoUrl() == null){
-            user.setFoto("");
+        if ( firebaseUser.getPhotoUrl() == null ){
+            usuario.setFoto("");
         }else {
-            user.setFoto( fbUser.getPhotoUrl().toString());
+            usuario.setFoto( firebaseUser.getPhotoUrl().toString() );
         }
-
-        return user;
+        return usuario;
     }
 }

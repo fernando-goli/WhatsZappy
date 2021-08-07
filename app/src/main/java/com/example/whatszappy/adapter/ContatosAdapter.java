@@ -17,45 +17,44 @@ import com.example.whatszappy.model.Usuario;
 
 import java.util.List;
 
+import de.hdodenhof.circleimageview.CircleImageView;
+
 public class ContatosAdapter extends RecyclerView.Adapter<ContatosAdapter.MyViewHolder> {
 
     private List<Usuario> contatos;
     private Context context;
 
-    public ContatosAdapter(List<Usuario> listContatos, Context c) {
-        this.contatos = listContatos;
+    public ContatosAdapter(List<Usuario> listaContatos, Context c) {
+        this.contatos = listaContatos;
         this.context = c;
     }
 
-    @NonNull
     @Override
-    public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View itemLista = LayoutInflater.from( parent.getContext() )
-            .inflate(R.layout.adapter_contatos, parent, false);
-
-
+    public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        View itemLista = LayoutInflater.from( parent.getContext() ).inflate(R.layout.adapter_contatos, parent, false);
         return new MyViewHolder(itemLista);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
+    public void onBindViewHolder(MyViewHolder holder, int position) {
 
-        Usuario user = contatos.get( position );
-        boolean cabecalho = user.getEmail().isEmpty();
+        Usuario usuario = contatos.get( position );
+        boolean cabecalho = usuario.getEmail().isEmpty();
 
-        holder.name.setText( user.getNome() );
-        holder.email.setText( user.getEmail() );
+        holder.nome.setText( usuario.getNome() );
+        holder.email.setText( usuario.getEmail() );
 
-        if (user.getFoto() != null ){
-            Uri uri = Uri.parse( user.getFoto());
-            Glide.with( context ).load(uri).into(holder.photo);
-        } else {
-            if ( cabecalho ){
-                holder.photo.setImageResource( R.drawable.icone_grupo );
-                holder.email.setVisibility(View.GONE);
-            }else{
-            holder.photo.setImageResource( R.drawable.padrao );
+        if( usuario.getFoto() != null ){
+            Uri uri = Uri.parse( usuario.getFoto() );
+            Glide.with( context ).load( uri ).into( holder.foto );
+        }else {
+            if( cabecalho ){
+                holder.foto.setImageResource( R.drawable.icone_grupo );
+                holder.email.setVisibility( View.GONE );
+            }else {
+                holder.foto.setImageResource( R.drawable.padrao );
             }
+
         }
 
     }
@@ -65,18 +64,17 @@ public class ContatosAdapter extends RecyclerView.Adapter<ContatosAdapter.MyView
         return contatos.size();
     }
 
-    public class MyViewHolder extends RecyclerView.ViewHolder{
+    public class MyViewHolder extends RecyclerView.ViewHolder {
 
-        ImageView photo;
-        TextView name, email;
+        CircleImageView foto;
+        TextView nome, email;
 
-        public MyViewHolder(@NonNull View itemView) {
+        public MyViewHolder(View itemView) {
             super(itemView);
 
-            photo = itemView.findViewById(R.id.circleImageContato);
-            name = itemView.findViewById(R.id.textNameContato);
+            foto = itemView.findViewById(R.id.imageViewFotoContato);
+            nome = itemView.findViewById(R.id.textNomeContato);
             email = itemView.findViewById(R.id.textEmailContato);
-
 
         }
     }

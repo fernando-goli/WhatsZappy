@@ -5,10 +5,10 @@ import com.google.firebase.database.DatabaseReference;
 
 public class Conversa {
 
-    private String idReme;
-    private String idDest;
-    private String lastMsg;
-    private Usuario userExib;
+    private String idRemetente;
+    private String idDestinatario;
+    private String ultimaMensagem;
+    private Usuario usuarioExibicao;
     private String isGroup;
     private Grupo grupo;
 
@@ -21,8 +21,8 @@ public class Conversa {
         DatabaseReference databaseReference = ConfigFirebase.getFirebaseDatabase();
         DatabaseReference conversaRef = databaseReference.child("conversas");
 
-        conversaRef.child(this.getIdReme() )
-            .child(this.getIdDest() )
+        conversaRef.child(this.getIdRemetente() )
+            .child(this.getIdDestinatario() )
             .setValue( this );
     }
 
@@ -42,35 +42,35 @@ public class Conversa {
         this.grupo = grupo;
     }
 
-    public String getIdReme() {
-        return idReme;
+    public String getIdRemetente() {
+        return idRemetente;
     }
 
-    public void setIdReme(String idReme) {
-        this.idReme = idReme;
+    public void setIdRemetente(String idRemetente) {
+        this.idRemetente = idRemetente;
     }
 
-    public String getIdDest() {
-        return idDest;
+    public String getIdDestinatario() {
+        return idDestinatario;
     }
 
-    public void setIdDest(String idDest) {
-        this.idDest = idDest;
+    public void setIdDestinatario(String idDestinatario) {
+        this.idDestinatario = idDestinatario;
     }
 
-    public String getLastMsg() {
-        return lastMsg;
+    public String getUltimaMensagem() {
+        return ultimaMensagem;
     }
 
-    public void setLastMsg(String lastMsg) {
-        this.lastMsg = lastMsg;
+    public void setUltimaMensagem(String ultimaMensagem) {
+        this.ultimaMensagem = ultimaMensagem;
     }
 
-    public Usuario getUserExib() {
-        return userExib;
+    public Usuario getUsuarioExibicao() {
+        return usuarioExibicao;
     }
 
-    public void setUserExib(Usuario userExib) {
-        this.userExib = userExib;
+    public void setUsuarioExibicao(Usuario usuarioExibicao) {
+        this.usuarioExibicao = usuarioExibicao;
     }
 }

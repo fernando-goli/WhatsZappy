@@ -22,50 +22,64 @@ public class MensagensAdapter extends RecyclerView.Adapter<MensagensAdapter.MyVi
 
     private List<Mensagem> mensagens;
     private Context context;
-    private static final int TIPO_REME = 0;
-    private static final int TIPO_DEST = 1;
+    private static final int TIPO_REMETENTE     = 0;
+    private static final int TIPO_DESTINATARIO  = 1;
 
-
-    public MensagensAdapter (List<Mensagem> lista, Context c ) {
+    public MensagensAdapter(List<Mensagem> lista, Context c) {
         this.mensagens = lista;
         this.context = c;
     }
 
-    public MensagensAdapter() {
-    }
-
-    @NonNull
     @Override
-    public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 
         View item = null;
-        if( viewType == TIPO_REME){
-            item = LayoutInflater.from( parent.getContext()).inflate(R.layout.adapter_mensagem_remetente,parent, false);
-
-        } else if (viewType == TIPO_DEST){
-            item = LayoutInflater.from( parent.getContext()).inflate(R.layout.adapter_mensagem_destinatario,parent, false);
+        if ( viewType == TIPO_REMETENTE ){
+            item = LayoutInflater.from(parent.getContext()).inflate(R.layout.adapter_mensagem_remetente, parent, false);
+        }else if( viewType == TIPO_DESTINATARIO ){
+            item = LayoutInflater.from(parent.getContext()).inflate(R.layout.adapter_mensagem_destinatario, parent, false);
         }
+
         return new MyViewHolder(item);
+
     }
 
     @Override
-    public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
+    public void onBindViewHolder(MyViewHolder holder, int position) {
 
         Mensagem mensagem = mensagens.get( position );
         String msg = mensagem.getMensagem();
-        String imagem = mensagem.getImage();
+        String imagem = mensagem.getImagem();
 
-        if( imagem != null ){
+        if ( imagem != null ){
             Uri url = Uri.parse( imagem );
-            holder.imagem.setVisibility(View.VISIBLE);
+            Glide.with(context).load(url).into( holder.imagem );
 
-            Glide.with(context).load( url ).into( holder.imagem );
+            String nome = mensagem.getNome();
+            if( !nome.isEmpty() ){
+                holder.nome.setText( nome );
+            }else {
+                holder.nome.setVisibility(View.GONE);
+            }
 
-            holder.mensagemTxt.setVisibility( View.GONE );
-        } else {
-            holder.mensagemTxt.setText( msg );
+            //Esconder o texto
+            holder.mensagem.setVisibility(View.GONE);
+
+        }else {
+            holder.mensagem.setText( msg );
+
+            String nome = mensagem.getNome();
+            if( !nome.isEmpty() ){
+                holder.nome.setText( nome );
+            }else {
+                holder.nome.setVisibility(View.GONE);
+            }
+
+            //Esconder a imagem
             holder.imagem.setVisibility(View.GONE);
         }
+
+
     }
 
     @Override
@@ -76,26 +90,32 @@ public class MensagensAdapter extends RecyclerView.Adapter<MensagensAdapter.MyVi
     @Override
     public int getItemViewType(int position) {
 
-        Mensagem msg = mensagens.get( position );
-        String idUsuario = UserFirebase.getUidFirebase();
-        if (idUsuario.equals( msg.getIdUser() ) ){
-            return TIPO_REME;
-        }else{
-            return TIPO_DEST;
+        Mensagem mensagem = mensagens.get( position );
+
+        String idUsuario = UserFirebase.getIdentificadorUsuario();
+
+        if ( idUsuario.equals( mensagem.getIdUsuario() ) ){
+            return TIPO_REMETENTE;
         }
+
+        return TIPO_DESTINATARIO;
+
     }
 
-    public class MyViewHolder extends RecyclerView.ViewHolder{
+    public class MyViewHolder extends RecyclerView.ViewHolder {
 
-        TextView mensagemTxt;
+        TextView mensagem;
+        TextView nome;
         ImageView imagem;
-        public MyViewHolder(@NonNull View itemView) {
+
+        public MyViewHolder(View itemView) {
             super(itemView);
 
-            mensagemTxt = itemView.findViewById(R.id.textMsgText);
-            imagem = itemView.findViewById(R.id.imageMsgImage);
+            mensagem = itemView.findViewById(R.id.textMensagemTexto);
+            imagem   = itemView.findViewById(R.id.imageMensagemFoto);
+            nome = itemView.findViewById(R.id.textNomeExibicao);
+
         }
     }
-
 
 }

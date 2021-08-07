@@ -6,7 +6,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -16,10 +15,11 @@ import com.bumptech.glide.Glide;
 import com.example.whatszappy.R;
 import com.example.whatszappy.model.Conversa;
 import com.example.whatszappy.model.Grupo;
-import com.example.whatszappy.model.Mensagem;
 import com.example.whatszappy.model.Usuario;
 
 import java.util.List;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 
 public class ConversasAdapter extends RecyclerView.Adapter<ConversasAdapter.MyViewHolder> {
 
@@ -31,46 +31,44 @@ public class ConversasAdapter extends RecyclerView.Adapter<ConversasAdapter.MyVi
         this.context = c;
     }
 
-    @NonNull
     @Override
-    public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View itemLista = LayoutInflater.from(parent.getContext() )
-            .inflate( R.layout.adapter_contatos, parent, false);
-
-        return new MyViewHolder( itemLista );
+    public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        View itemLista = LayoutInflater.from(parent.getContext()).inflate(R.layout.adapter_contatos, parent, false );
+        return new MyViewHolder(itemLista);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
+    public void onBindViewHolder(MyViewHolder holder, int position) {
 
         Conversa conversa = conversas.get( position );
-        holder.texto.setText( conversa.getLastMsg() );
+        holder.ultimaMensagem.setText( conversa.getUltimaMensagem() );
 
-        if( conversa.getIsGroup().equals("true") ) {
+        if ( conversa.getIsGroup().equals("true") ){
 
             Grupo grupo = conversa.getGrupo();
-            holder.name.setText( grupo.getNome() );
+            holder.nome.setText( grupo.getNome() );
 
-            if (grupo.getFoto() != null) {
-                Uri uri = Uri.parse(grupo.getFoto());
-                Glide.with(context).load(uri).into(holder.photo);
-            } else {
-                holder.photo.setImageResource(R.drawable.padrao);
+            if ( grupo.getFoto() != null ){
+                Uri uri = Uri.parse( grupo.getFoto() );
+                Glide.with( context ).load( uri ).into( holder.foto );
+            }else {
+                holder.foto.setImageResource(R.drawable.padrao);
             }
 
         }else {
+            Usuario usuario = conversa.getUsuarioExibicao();
+            if ( usuario != null ){
+                holder.nome.setText( usuario.getNome() );
 
-            Usuario usuario = conversa.getUserExib();
-            holder.name.setText(usuario.getNome());
-
-            if (usuario.getFoto() != null) {
-                Uri uri = Uri.parse(usuario.getFoto());
-                Glide.with(context).load(uri).into(holder.photo);
-            } else {
-                holder.photo.setImageResource(R.drawable.padrao);
+                if ( usuario.getFoto() != null ){
+                    Uri uri = Uri.parse( usuario.getFoto() );
+                    Glide.with( context ).load( uri ).into( holder.foto );
+                }else {
+                    holder.foto.setImageResource(R.drawable.padrao);
+                }
             }
-
         }
+
 
     }
 
@@ -79,16 +77,18 @@ public class ConversasAdapter extends RecyclerView.Adapter<ConversasAdapter.MyVi
         return conversas.size();
     }
 
-    public class MyViewHolder extends RecyclerView.ViewHolder{
+    public class MyViewHolder extends RecyclerView.ViewHolder {
 
-        ImageView photo;
-        TextView name, texto;
+        CircleImageView foto;
+        TextView nome, ultimaMensagem;
 
-        public MyViewHolder(@NonNull View itemView) {
+        public MyViewHolder(View itemView) {
             super(itemView);
-            photo = itemView.findViewById(R.id.circleImageContato);
-            name = itemView.findViewById(R.id.textNameContato);
-            texto = itemView.findViewById(R.id.textEmailContato);
+
+            foto = itemView.findViewById(R.id.imageViewFotoContato);
+            nome = itemView.findViewById(R.id.textNomeContato);
+            ultimaMensagem = itemView.findViewById(R.id.textEmailContato);
+
         }
     }
 }

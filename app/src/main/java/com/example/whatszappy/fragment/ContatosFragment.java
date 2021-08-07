@@ -9,7 +9,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 
-import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -35,12 +34,12 @@ import java.util.ArrayList;
  */
 public class ContatosFragment extends Fragment {
 
-    private RecyclerView rvListaContatos;
+    private RecyclerView recyclerViewListaContatos;
     private ContatosAdapter adapter;
     private ArrayList<Usuario> listaContatos = new ArrayList<>();
-    private DatabaseReference userRefDb;
+    private DatabaseReference usuariosRefDb;
     private ValueEventListener valueEventListenerContatos;
-    private FirebaseUser userAtual;
+    private FirebaseUser usuarioAtual;
 
     public ContatosFragment() {
         // Required empty public constructor
@@ -52,60 +51,72 @@ public class ContatosFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_contatos, container, false);
 
-        //config inicial
-        rvListaContatos = view.findViewById(R.id.recyclerListContatos);
-        userRefDb = ConfigFirebase.getFirebaseDatabase().child("usuarios");
-        userAtual = UserFirebase.getUserAtual();
+        //Configurações iniciais
+        recyclerViewListaContatos = view.findViewById(R.id.recyclerListContatos);
+        usuariosRefDb = ConfigFirebase.getFirebaseDatabase().child("usuarios");
+        usuarioAtual = UserFirebase.getUsuarioAtual();
 
-        //adapter
-        adapter = new ContatosAdapter( listaContatos, getActivity() );
+        //configurar adapter
+        adapter = new ContatosAdapter(listaContatos, getActivity() );
 
-        //recyclerview
-        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getActivity() );
-        rvListaContatos.setLayoutManager( layoutManager );
-        rvListaContatos.setHasFixedSize(true);
-        rvListaContatos.setAdapter( adapter );
+        //configurar recyclerview
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager( getActivity() );
+        recyclerViewListaContatos.setLayoutManager( layoutManager );
+        recyclerViewListaContatos.setHasFixedSize( true );
+        recyclerViewListaContatos.setAdapter( adapter );
 
-        //configura evento de clique no recyclerview
-        rvListaContatos.addOnItemTouchListener(
+        //Configurar evento de clique no recyclerview
+        recyclerViewListaContatos.addOnItemTouchListener(
             new RecyclerItemClickListener(
-                getActivity(), rvListaContatos, new RecyclerItemClickListener.OnItemClickListener() {
-                @Override
-                public void onItemClick(View view, int position) {
-                    Usuario userSelect = listaContatos.get( position );
-                    boolean cabecalho = userSelect.getEmail().isEmpty();
-                    if ( cabecalho ){
-                        Intent i = new Intent(getActivity(), GrupoActivity.class);
-                        startActivity( i );
-                    } else {
-                        Intent i = new Intent(getActivity(), ChatActivity.class);
-                        i.putExtra("chatContato", userSelect);
-                        startActivity( i );
+                getActivity(),
+                recyclerViewListaContatos,
+                new RecyclerItemClickListener.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(View view, int position) {
+
+                        Usuario usuarioSelecionado = listaContatos.get( position );
+                        boolean cabecalho = usuarioSelecionado.getEmail().isEmpty();
+
+                        if( cabecalho ){
+
+                            Intent i = new Intent(getActivity(), GrupoActivity.class);
+                            startActivity( i );
+
+                        }else {
+                            Intent i = new Intent(getActivity(), ChatActivity.class);
+                            i.putExtra("chatContato", usuarioSelecionado );
+                            startActivity( i );
+                        }
+
+
+
+                    }
+
+                    @Override
+                    public void onLongItemClick(View view, int position) {
+
+                    }
+
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
                     }
                 }
-
-                @Override
-                public void onLongItemClick(View view, int position) {
-
-                }
-
-                @Override
-                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
-                }
-            }
             )
         );
 
+        /*Define usuário com e-mail vazio
+         * em caso de e-mail vazio o usuário será utilizado como
+         * cabecalho, exibindo novo grupo */
         Usuario itemGrupo = new Usuario();
-        itemGrupo.setNome("Novo Grupo");
+        itemGrupo.setNome("Novo grupo");
         itemGrupo.setEmail("");
 
         listaContatos.add( itemGrupo );
 
-        return view;
 
-    } //onCreate
+        return view;
+    }
 
     @Override
     public void onStart() {
@@ -116,34 +127,36 @@ public class ContatosFragment extends Fragment {
     @Override
     public void onStop() {
         super.onStop();
-        userRefDb.removeEventListener( valueEventListenerContatos );
+        usuariosRefDb.removeEventListener( valueEventListenerContatos );
     }
 
     public void recuperarContatos(){
 
-        valueEventListenerContatos = userRefDb.addValueEventListener(new ValueEventListener() {
+        valueEventListenerContatos = usuariosRefDb.addValueEventListener(new ValueEventListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
+            public void onDataChange(DataSnapshot dataSnapshot) {
 
-                for ( DataSnapshot dados: snapshot.getChildren() ){
-                    Usuario user = dados.getValue(Usuario.class);
+                for ( DataSnapshot dados: dataSnapshot.getChildren() ){
 
-                    String emailUserAtual = userAtual.getEmail();
-                    if ( !emailUserAtual.equals(user.getEmail() ) ){
-                        listaContatos.add( user );
+                    Usuario usuario = dados.getValue( Usuario.class );
+
+                    String emailUsuarioAtual = usuarioAtual.getEmail();
+                    if ( !emailUsuarioAtual.equals( usuario.getEmail() ) ){
+                        listaContatos.add( usuario );
                     }
+
 
                 }
 
                 adapter.notifyDataSetChanged();
+
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {
+            public void onCancelled(DatabaseError databaseError) {
 
             }
         });
+
     }
-
-
 }

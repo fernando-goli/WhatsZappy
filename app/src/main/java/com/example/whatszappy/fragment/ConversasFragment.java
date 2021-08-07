@@ -10,7 +10,6 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,7 +22,6 @@ import com.example.whatszappy.config.ConfigFirebase;
 import com.example.whatszappy.helper.RecyclerItemClickListener;
 import com.example.whatszappy.helper.UserFirebase;
 import com.example.whatszappy.model.Conversa;
-import com.example.whatszappy.model.Usuario;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -37,10 +35,10 @@ import java.util.List;
  */
 public class ConversasFragment extends Fragment {
 
-    private RecyclerView recyclerConversas;
+    private RecyclerView recyclerViewConversas;
     private List<Conversa> listaConversas = new ArrayList<>();
     private ConversasAdapter adapter;
-    private DatabaseReference databaseReference;
+    private DatabaseReference database;
     private DatabaseReference conversasRef;
     private ChildEventListener childEventListenerConversas;
 
@@ -54,57 +52,63 @@ public class ConversasFragment extends Fragment {
 
         View view = inflater.inflate(R.layout.fragment_conversas, container, false);
 
-        recyclerConversas = view.findViewById(R.id.recycleListConversas);
+        recyclerViewConversas = view.findViewById(R.id.recycleListConversas);
 
-        //adapter
-        adapter = new ConversasAdapter(listaConversas, getActivity() );
+        //Configurar adapter
+        adapter = new ConversasAdapter(listaConversas, getActivity());
 
-        //recyclerView
-        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getActivity() );
-        recyclerConversas.setLayoutManager( layoutManager );
-        recyclerConversas.setHasFixedSize( true );
-        recyclerConversas.setAdapter( adapter );
-        String idUsuario = UserFirebase.getUidFirebase();
+        //Configurar recyclerview
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getActivity());
+        recyclerViewConversas.setLayoutManager( layoutManager );
+        recyclerViewConversas.setHasFixedSize(true);
+        recyclerViewConversas.setAdapter( adapter );
 
-        //Evento clique
-        recyclerConversas.addOnItemTouchListener(
+        //Configurar evento de clique
+        recyclerViewConversas.addOnItemTouchListener(
             new RecyclerItemClickListener(
-                getActivity(), recyclerConversas, new RecyclerItemClickListener.OnItemClickListener() {
-                @Override
-                public void onItemClick(View view, int position) {
-                    Conversa conversaSelect = listaConversas.get(position);
+                getActivity(),
+                recyclerViewConversas,
+                new RecyclerItemClickListener.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(View view, int position) {
 
-                    if(conversaSelect.getIsGroup().equals("true")){
+                        Conversa conversaSelecionada = listaConversas.get( position );
 
-                        Intent i = new Intent(getActivity(), ChatActivity.class);
-                        i.putExtra("chatGrupo", conversaSelect.getGrupo());
-                        startActivity(i);
+                        if( conversaSelecionada.getIsGroup().equals("true") ){
 
-                    }else {
+                            Intent i = new Intent(getActivity(), ChatActivity.class);
+                            i.putExtra("chatGrupo", conversaSelecionada.getGrupo() );
+                            startActivity( i );
 
-                        Intent i = new Intent(getActivity(), ChatActivity.class);
-                        i.putExtra("chatContato", conversaSelect.getUserExib());
-                        startActivity(i);
+                        }else {
+                            Intent i = new Intent(getActivity(), ChatActivity.class);
+                            i.putExtra("chatContato", conversaSelecionada.getUsuarioExibicao() );
+                            startActivity( i );
+                        }
+
+                    }
+
+                    @Override
+                    public void onLongItemClick(View view, int position) {
+
+                    }
+
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
                     }
                 }
-
-                @Override
-                public void onLongItemClick(View view, int position) {
-
-                }
-
-                @Override
-                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
-                }
-            }
             )
         );
 
-        databaseReference = ConfigFirebase.getFirebaseDatabase();
-        conversasRef = databaseReference.child("conversas").child( idUsuario );
 
-        return  view;
+        //Configura conversas ref
+        String identificadorUsuario = UserFirebase.getIdentificadorUsuario();
+        database = ConfigFirebase.getFirebaseDatabase();
+        conversasRef = database.child("conversas")
+            .child( identificadorUsuario );
+
+        return view;
     }
 
     @Override
@@ -116,68 +120,69 @@ public class ConversasFragment extends Fragment {
     @Override
     public void onStop() {
         super.onStop();
-        conversasRef.removeEventListener(childEventListenerConversas);
+        conversasRef.removeEventListener( childEventListenerConversas );
     }
 
-    public void searchConversas(String texto){
-        //Log.d("pesquisa", texto);
-        List<Conversa> listConverSearch = new ArrayList<>();
-        for (Conversa conversa : listaConversas){
+    public void pesquisarConversas(String texto){
+        //Log.d("pesquisa",  texto );
 
-            String nome = conversa.getUserExib().getNome().toLowerCase();
-            String ultimaMsg = conversa.getLastMsg().toLowerCase();
-            if ( nome.contains(texto) || ultimaMsg.contains(texto) ){
-                listConverSearch.add( conversa );
+        List<Conversa> listaConversasBusca = new ArrayList<>();
+
+        for ( Conversa conversa : listaConversas ){
+
+            String nome = conversa.getUsuarioExibicao().getNome().toLowerCase();
+            String ultimaMsg = conversa.getUltimaMensagem().toLowerCase();
+
+            if( nome.contains( texto ) || ultimaMsg.contains( texto ) ){
+                listaConversasBusca.add( conversa );
             }
         }
 
-        adapter = new ConversasAdapter( listConverSearch, getActivity() );
-        recyclerConversas.setAdapter( adapter );
+        adapter = new ConversasAdapter(listaConversasBusca, getActivity());
+        recyclerViewConversas.setAdapter(adapter);
         adapter.notifyDataSetChanged();
+
     }
 
-    public void chargeC(){
-
-        adapter = new ConversasAdapter( listaConversas, getActivity() );
-        recyclerConversas.setAdapter( adapter );
+    public void recarregarConversas(){
+        adapter = new ConversasAdapter(listaConversas, getActivity());
+        recyclerViewConversas.setAdapter(adapter);
         adapter.notifyDataSetChanged();
     }
-
 
     public void recuperarConversas(){
 
-            childEventListenerConversas = conversasRef.addChildEventListener(new ChildEventListener() {
+        childEventListenerConversas = conversasRef.addChildEventListener(new ChildEventListener() {
             @Override
-            public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
 
-                //recupera conversa
-                Conversa conversa = snapshot.getValue( Conversa.class );
+                // Recuperar conversas
+                Conversa conversa = dataSnapshot.getValue( Conversa.class );
                 listaConversas.add( conversa );
                 adapter.notifyDataSetChanged();
 
             }
 
             @Override
-            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
 
             }
 
             @Override
-            public void onChildRemoved(@NonNull DataSnapshot snapshot) {
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
 
             }
 
             @Override
-            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
 
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {
+            public void onCancelled(DatabaseError databaseError) {
 
             }
         });
+
     }
-
-
 }

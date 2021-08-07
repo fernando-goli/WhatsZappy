@@ -11,9 +11,44 @@ import java.util.Map;
 
 public class Usuario implements Serializable {
 
-    private String nome, email, senha, idUser, foto;
+    private String nome, email, senha, id, foto;
 
     public Usuario() {
+    }
+
+    public void salvar(){
+
+        DatabaseReference firebaseRef = ConfigFirebase.getFirebaseDatabase();
+        DatabaseReference usuario = firebaseRef.child("usuarios").child( getId() );
+
+        usuario.setValue( this );
+
+    }
+
+    public void atualizar(){
+
+        String identificadorUsuario = UserFirebase.getIdentificadorUsuario();
+        DatabaseReference database = ConfigFirebase.getFirebaseDatabase();
+
+        DatabaseReference usuariosRef = database.child("usuarios")
+            .child( identificadorUsuario );
+
+        Map<String, Object> valoresUsuario = converterParaMap();
+
+        usuariosRef.updateChildren( valoresUsuario );
+
+    }
+
+    @Exclude
+    public Map<String, Object> converterParaMap(){
+
+        HashMap<String, Object> usuarioMap = new HashMap<>();
+        usuarioMap.put("email", getEmail() );
+        usuarioMap.put("nome", getNome() );
+        usuarioMap.put("foto", getFoto() );
+
+        return usuarioMap;
+
     }
 
     public String getFoto() {
@@ -22,6 +57,15 @@ public class Usuario implements Serializable {
 
     public void setFoto(String foto) {
         this.foto = foto;
+    }
+
+    @Exclude
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getNome() {
@@ -47,44 +91,5 @@ public class Usuario implements Serializable {
 
     public void setSenha(String senha) {
         this.senha = senha;
-    }
-
-    //TODO: Por enquanto manter comentado o exclude.
-    //@Exclude
-    public String getIdUser() {
-        return idUser;
-    }
-
-    public void setIdUser(String idUser) {
-        this.idUser = idUser;
-    }
-
-    public void salvar(){
-        DatabaseReference firebaseDb = ConfigFirebase.getFirebaseDatabase();
-        firebaseDb.child("usuarios")
-            .child(this.getIdUser())
-            .setValue( this );
-    }
-
-    public void update() {
-        String uidUser = UserFirebase.getUidFirebase();
-        DatabaseReference database = ConfigFirebase.getFirebaseDatabase();
-        DatabaseReference userRef = database
-            .child("usuarios")
-            .child(uidUser);
-
-        Map<String, Object> valueUser = convertMap();
-
-        userRef.updateChildren(valueUser);
-    }
-
-    @Exclude
-    public Map <String, Object> convertMap () {
-        HashMap<String, Object> userMap = new HashMap<>();
-        userMap.put("email", getEmail());
-        userMap.put("nome", getNome());
-        userMap.put("foto", getFoto());
-
-        return userMap;
     }
 }
