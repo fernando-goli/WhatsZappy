@@ -161,7 +161,7 @@ public class ConfigActivity extends AppCompatActivity {
                     }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                         @Override
                         public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                            Toast.makeText(ConfigActivity.this, "Sucesso ao fazer upload", Toast.LENGTH_SHORT).show();
+                            //Toast.makeText(ConfigActivity.this, "Sucesso ao fazer upload", Toast.LENGTH_SHORT).show();
 
                             imageRef.getDownloadUrl().addOnCompleteListener(new OnCompleteListener<Uri>() {
                                 @Override

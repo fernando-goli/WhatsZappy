@@ -20,15 +20,31 @@
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
         <activity
+            android:name=".activity.CadastroGrupoActivity"
+            android:label="@string/title_activity_cadastro_grupo"
+            android:parentActivityName=".activity.GrupoActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.whatszappy.activity.GrupoActivity" />
+        </activity>
+        <activity
+            android:name=".activity.GrupoActivity"
+            android:label="@string/title_activity_grupo"
+            android:parentActivityName=".activity.MainActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.whatszappy.activity.MainActivity" />
+        </activity>
+        <activity
             android:name=".activity.ChatActivity"
             android:label="@string/title_activity_chat"
-            android:theme="@style/AppTheme.NoActionBar"
-            android:parentActivityName=".activity.MainActivity"/>
-
+            android:parentActivityName=".activity.MainActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".activity.ConfigActivity"
-            android:parentActivityName=".activity.MainActivity"/>
-
+            android:parentActivityName=".activity.MainActivity" />
         <activity android:name=".activity.MainActivity" />
         <activity android:name=".activity.RegisterActivity" />
         <activity android:name=".activity.LoginActivity">

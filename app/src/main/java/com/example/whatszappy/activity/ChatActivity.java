@@ -27,6 +27,7 @@ import com.example.whatszappy.adapter.MensagensAdapter;
 import com.example.whatszappy.config.ConfigFirebase;
 import com.example.whatszappy.helper.UserFirebase;
 import com.example.whatszappy.model.Conversa;
+import com.example.whatszappy.model.Grupo;
 import com.example.whatszappy.model.Mensagem;
 import com.example.whatszappy.model.Usuario;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -64,6 +65,7 @@ public class ChatActivity extends AppCompatActivity {
     private DatabaseReference msgRef;
     private ChildEventListener childEventListenerMensagens;
     private StorageReference storage;
+    private Grupo grupo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,22 +93,43 @@ public class ChatActivity extends AppCompatActivity {
         Bundle bundle = getIntent().getExtras();
         if (bundle != null){
 
-            userDestinatario = ( Usuario ) bundle.getSerializable("chatContato");
-            nameChat.setText( userDestinatario.getNome() );
+            if (bundle.containsKey("chatGrupo") ){
 
+                grupo = ( Grupo ) bundle.getSerializable("chatGrupo");
+                idUserDesti = grupo.getId();
+                nameChat.setText( grupo.getNome() );
 
-            String photo = userDestinatario.getFoto();
-            if( photo != null ){
-                Uri url = Uri.parse( userDestinatario.getFoto() );
-                Glide.with(ChatActivity.this)
-                    .load(url)
-                    .into(imageChat);
+                String photo = grupo.getFoto();
+                if( photo != null ){
+                    Uri url = Uri.parse( photo );
+                    Glide.with(ChatActivity.this)
+                        .load(url)
+                        .into(imageChat);
+
+                } else {
+                    imageChat.setImageResource(R.drawable.padrao);
+                }
+
 
             } else {
-                imageChat.setImageResource(R.drawable.padrao);
+                userDestinatario = ( Usuario ) bundle.getSerializable("chatContato");
+                nameChat.setText( userDestinatario.getNome() );
+
+                String photo = userDestinatario.getFoto();
+                if( photo != null ){
+                    Uri url = Uri.parse( userDestinatario.getFoto() );
+                    Glide.with(ChatActivity.this)
+                        .load(url)
+                        .into(imageChat);
+
+                } else {
+                    imageChat.setImageResource(R.drawable.padrao);
+                }
+                //recupera dados user destinatario
+                idUserDesti = userDestinatario.getIdUser();
+
             }
-            //recupera dados user destinatario
-            idUserDesti = userDestinatario.getIdUser();
+
         }
 
         //config adapter
@@ -136,7 +159,6 @@ public class ChatActivity extends AppCompatActivity {
 
 
     } // onCreate
-
 
 
     @Override //enviar imagem

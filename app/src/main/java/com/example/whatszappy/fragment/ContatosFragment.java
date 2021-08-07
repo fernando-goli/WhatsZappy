@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.whatszappy.R;
 import com.example.whatszappy.activity.ChatActivity;
+import com.example.whatszappy.activity.GrupoActivity;
 import com.example.whatszappy.adapter.ContatosAdapter;
 import com.example.whatszappy.config.ConfigFirebase;
 import com.example.whatszappy.helper.RecyclerItemClickListener;
@@ -72,9 +73,15 @@ public class ContatosFragment extends Fragment {
                 @Override
                 public void onItemClick(View view, int position) {
                     Usuario userSelect = listaContatos.get( position );
-                    Intent i = new Intent(getActivity(), ChatActivity.class);
-                    i.putExtra("chatContato", userSelect);
-                    startActivity( i );
+                    boolean cabecalho = userSelect.getEmail().isEmpty();
+                    if ( cabecalho ){
+                        Intent i = new Intent(getActivity(), GrupoActivity.class);
+                        startActivity( i );
+                    } else {
+                        Intent i = new Intent(getActivity(), ChatActivity.class);
+                        i.putExtra("chatContato", userSelect);
+                        startActivity( i );
+                    }
                 }
 
                 @Override
@@ -90,9 +97,15 @@ public class ContatosFragment extends Fragment {
             )
         );
 
+        Usuario itemGrupo = new Usuario();
+        itemGrupo.setNome("Novo Grupo");
+        itemGrupo.setEmail("");
+
+        listaContatos.add( itemGrupo );
 
         return view;
-    }
+
+    } //onCreate
 
     @Override
     public void onStart() {
@@ -119,7 +132,6 @@ public class ContatosFragment extends Fragment {
                     if ( !emailUserAtual.equals(user.getEmail() ) ){
                         listaContatos.add( user );
                     }
-
 
                 }
 

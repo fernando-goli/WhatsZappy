@@ -72,11 +72,20 @@ public class ConversasFragment extends Fragment {
                 getActivity(), recyclerConversas, new RecyclerItemClickListener.OnItemClickListener() {
                 @Override
                 public void onItemClick(View view, int position) {
+                    Conversa conversaSelect = listaConversas.get(position);
 
-                    Conversa conversaSelect = listaConversas.get( position );
-                    Intent i = new Intent(getActivity(), ChatActivity.class);
-                    i.putExtra("chatContato", conversaSelect.getUserExib() );
-                    startActivity( i );
+                    if(conversaSelect.getIsGroup().equals("true")){
+
+                        Intent i = new Intent(getActivity(), ChatActivity.class);
+                        i.putExtra("chatGrupo", conversaSelect.getGrupo());
+                        startActivity(i);
+
+                    }else {
+
+                        Intent i = new Intent(getActivity(), ChatActivity.class);
+                        i.putExtra("chatContato", conversaSelect.getUserExib());
+                        startActivity(i);
+                    }
                 }
 
                 @Override
@@ -91,7 +100,6 @@ public class ConversasFragment extends Fragment {
             }
             )
         );
-
 
         databaseReference = ConfigFirebase.getFirebaseDatabase();
         conversasRef = databaseReference.child("conversas").child( idUsuario );
@@ -113,8 +121,28 @@ public class ConversasFragment extends Fragment {
 
     public void searchConversas(String texto){
         //Log.d("pesquisa", texto);
+        List<Conversa> listConverSearch = new ArrayList<>();
+        for (Conversa conversa : listaConversas){
 
+            String nome = conversa.getUserExib().getNome().toLowerCase();
+            String ultimaMsg = conversa.getLastMsg().toLowerCase();
+            if ( nome.contains(texto) || ultimaMsg.contains(texto) ){
+                listConverSearch.add( conversa );
+            }
+        }
+
+        adapter = new ConversasAdapter( listConverSearch, getActivity() );
+        recyclerConversas.setAdapter( adapter );
+        adapter.notifyDataSetChanged();
     }
+
+    public void chargeC(){
+
+        adapter = new ConversasAdapter( listaConversas, getActivity() );
+        recyclerConversas.setAdapter( adapter );
+        adapter.notifyDataSetChanged();
+    }
+
 
     public void recuperarConversas(){
 
