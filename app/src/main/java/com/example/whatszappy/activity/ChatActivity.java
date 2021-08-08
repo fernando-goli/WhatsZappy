@@ -117,9 +117,7 @@ public class ChatActivity extends AppCompatActivity {
                     circleImageViewFoto.setImageResource(R.drawable.padrao);
                 }
 
-
             }else {
-                /**********/
                 usuarioDestinatario = (Usuario) bundle.getSerializable("chatContato");
                 textViewNome.setText( usuarioDestinatario.getNome() );
 
@@ -135,7 +133,6 @@ public class ChatActivity extends AppCompatActivity {
 
                 //recuperar dados usuario destinatario
                 idUsuarioDestinatario = Base64Custom.codificarBase64( usuarioDestinatario.getEmail() );
-                /**********/
             }
 
 
@@ -230,20 +227,42 @@ public class ChatActivity extends AppCompatActivity {
                                 public void onComplete(@NonNull Task<Uri> task) {
                                     Uri url = task.getResult();
 
-                                    Mensagem mensagem = new Mensagem();
-                                    mensagem.setIdUsuario( idUsuarioRemetente);
-                                    mensagem.setMensagem(".jpeg");
-                                    mensagem.setImagem( url.toString() );
-                                    //Salvar mensagem remetente
-                                    salvarMensagem(idUsuarioRemetente, idUsuarioDestinatario, mensagem);
-                                    //Salvar mensagem para o destinatario
-                                    salvarMensagem(idUsuarioDestinatario, idUsuarioRemetente, mensagem);
+                                    if ( usuarioDestinatario != null ){
+                                        Mensagem mensagem = new Mensagem();
+                                        mensagem.setIdUsuario( idUsuarioRemetente);
+                                        mensagem.setMensagem(".jpeg");
+                                        mensagem.setImagem( url.toString() );
+                                        //Salvar mensagem remetente
+                                        salvarMensagem(idUsuarioRemetente, idUsuarioDestinatario, mensagem);
+                                        //Salvar mensagem para o destinatario
+                                        salvarMensagem(idUsuarioDestinatario, idUsuarioRemetente, mensagem);
+                                    } else {
+                                        for ( Usuario membro: grupo.getMembros() ){
 
+                                            String idRemetenteGrupo = Base64Custom.codificarBase64( membro.getEmail() );
+                                            String idUsuarioLogadoGrupo = UserFirebase.getIdentificadorUsuario();
+
+                                            Mensagem mensagem = new Mensagem();
+                                            mensagem.setIdUsuario( idUsuarioLogadoGrupo );
+                                            mensagem.setMensagem( ".jpeg" );
+                                            mensagem.setNome( usuarioRemetente.getNome() );
+                                            mensagem.setImagem( url.toString() );
+
+                                            //salvar mensagem para o membro
+                                            salvarMensagem(idRemetenteGrupo, idUsuarioDestinatario, mensagem );
+
+                                            //Salvar conversa
+                                            salvarConversa( idRemetenteGrupo, idUsuarioDestinatario, usuarioDestinatario, mensagem, true);
+
+                                        }
+                                    }
                                     Toast.makeText(ChatActivity.this,
                                         "Sucesso ao enviar imagem", Toast.LENGTH_SHORT).show();
                                 }
                             });
-                            
+
+
+
                         }
                     });
 
@@ -362,6 +381,8 @@ public class ChatActivity extends AppCompatActivity {
     }
 
     private void recuperarMensagens(){
+
+        mensagens.clear();
 
         childEventListenerMensagens = mensagensRef.addChildEventListener(new ChildEventListener() {
             @Override
