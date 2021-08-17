@@ -1,2 +1,2 @@
 # WhatsZappy
-A whatsapp clone.
+Um clone do whatsapp junto com o firebase
